@@ -102,10 +102,17 @@ export class PlannerCustomization {
       previewView,
       message,
     );
-    if ('ok' in res && res.ok) {
+    // applyAndSave returns `{ ok:true, view } | ProposeOutcome`. Both success arms
+    // share `ok:true`, so discriminate on the presence of `view` vs `preview`.
+    if (res.ok === false) {
+      return res;
+    }
+    if ('view' in res) {
       return { ok: true, view: res.view };
     }
-    return res as Extract<ProposeOutcome, { ok: false }>;
+    // Unreachable in practice (a successful applyAndSave carries `view`), but keeps
+    // the function total for the `{ ok:true, preview }` shape of the union.
+    return { ok: true, view: res.preview.view };
   }
 
   /** reopen: load latest saved state, revalidated under the CURRENT policy. */
