@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { RenderDescriptor, ViewDescriptor } from '../ports/foundation.js';
 import { TailoredUiCapabilityAdapter } from '../adapters/ui-capability.js';
 import { PlannerComponents, PlannerControls } from '../customization/policy.js';
@@ -59,17 +60,18 @@ export function TaskList(props: TaskListProps): JSX.Element {
   const gap = density === 'compact' ? 4 : 12;
   const ordered = sortTasks(tasks);
 
+  const containerStyle: CSSProperties = {
+    display: layout === 'agenda' ? 'flex' : 'grid',
+    flexDirection: 'column',
+    gap,
+    fontSize: `${fontScale}rem`,
+  };
+  if (layout === 'board') {
+    containerStyle.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
+  }
+
   return (
-    <div
-      data-layout={layout}
-      style={{
-        display: layout === 'agenda' ? 'flex' : 'grid',
-        flexDirection: 'column',
-        gridTemplateColumns: layout === 'board' ? 'repeat(auto-fill, minmax(220px, 1fr))' : undefined,
-        gap,
-        fontSize: `${fontScale}rem`,
-      }}
-    >
+    <div data-layout={layout} style={containerStyle}>
       {ordered.length === 0 && <p style={{ opacity: 0.6 }}>No tasks yet. Add one above.</p>}
       {ordered.map((t, index) => (
         <TaskCard
